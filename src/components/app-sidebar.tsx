@@ -29,10 +29,21 @@ const data = {
       url: "/dashboard",
       icon: IconDashboard,
     },
-    {
+     {
       title: "Estoque",
-      url: "/dashboard/estoque",
+      url: "#",
       icon: IconListDetails,
+      submenu: true,
+      children: [
+        {
+          title: "Produtos",
+          url: "/dashboard/estoque/produtos",
+        },
+        {
+          title: "Categorias",
+          url: "/dashboard/estoque/categorias",
+        },
+      ],
     },
     {
       title: "Pedidos",

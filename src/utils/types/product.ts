@@ -12,3 +12,7 @@ export interface Product {
   createdAt: Date
   updatedAt: Date
 }
+
+export type NewProduct = Omit<Product, "id" | "createdAt" | "updatedAt" | "category">
+
+export type UpdateProductInput = Omit<Product, "createdAt" | "updatedAt" | "category">

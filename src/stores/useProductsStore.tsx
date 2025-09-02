@@ -1,4 +1,4 @@
-import { Product } from "@/utils/types/product"
+import { NewProduct, Product, UpdateProductInput } from "@/utils/types/product"
 import { create } from "zustand"
 
 interface ProductsState {
@@ -6,9 +6,9 @@ interface ProductsState {
   isLoading: boolean
   error: string | null
   fetchProducts: () => Promise<void>
-  addProduct: (product: Omit<Product, "id" | "createdAt" | "updatedAt">) => Promise<void>
+  addProduct: (product: NewProduct) => Promise<void>
   deleteProduct: (id: string) => Promise<void>
-  editProduct: (product: Omit<Product, "createdAt" | "updatedAt">) => Promise<void>
+  editProduct: (product: UpdateProductInput) => Promise<void>
 }
 
 export const useProductsStore = create<ProductsState>((set, get) => ({

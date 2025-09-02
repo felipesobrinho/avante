@@ -23,8 +23,12 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       if (!res.ok) throw new Error("Erro ao buscar produtos")
       const data = await res.json()
       set({ products: data, isLoading: false })
-    } catch (err: any) {
-      set({ error: err.message, isLoading: false })
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 
@@ -38,8 +42,8 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       if (!res.ok) throw new Error("Erro ao adicionar produto")
       const data = await res.json()
       set({ products: [...get().products, data] })
-    } catch (err: any) {
-      set({ error: err.message })
+    } catch (err: unknown) {
+      set({ error: (err as Error).message })
     }
   },
 
@@ -53,8 +57,12 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       if (!res.ok) throw new Error("Erro ao excluir produto")
 
       set({ products: get().products.filter((p) => p.id !== id) })
-    } catch (err: any) {
-      set({ error: err.message })
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 
@@ -73,8 +81,12 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
           p.id === data.id ? { ...p, ...updatedData } : p
         ),
       })
-    } catch (err: any) {
-      set({ error: err.message })
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 }))

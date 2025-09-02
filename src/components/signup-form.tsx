@@ -23,28 +23,35 @@ export function SignUpForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
 
-    const { data, error } = await authClient.signUp.email(
-      {
-        email,
-        password,
-        name,
-        image: "",
-        callbackURL: "/dashboard",
-      },
-      {
-        onRequest: () => {
-          setLoading(true)
-        },
-        onSuccess: () => {
-          router.push("/dashboard")
-        },
-        onError: (ctx) => {
-          setLoading(false)
-          alert(ctx.error.message)
-        },
+    try {
+      const callbackURL = process.env.BETTER_AUTH_URL
+        ? `${process.env.BETTER_AUTH_URL}/dashboard`
+        : "/dashboard"
+
+      const { data, error } = await authClient.signUp.email(
+        {
+          email,
+          password,
+          name,
+          image: "",
+          callbackURL,
+        }
+      )
+
+      if (error) {
+        alert(error.message)
+        setLoading(false)
+        return
       }
-    )
+
+      router.push(callbackURL)
+    } catch (err: unknown) {
+      console.error(err)
+      alert("Ocorreu um erro ao criar a conta. Tente novamente.")
+      setLoading(false)
+    }
   }
 
   return (

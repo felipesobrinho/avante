@@ -22,27 +22,34 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
 
-    const { data, error } = await authClient.signIn.email(
-      {
-        email,
-        password,
-        callbackURL: "/dashboard",
-        rememberMe: false,
-      },
-      {
-        onRequest: () => {
-          setLoading(true)
-        },
-        onSuccess: () => {
-          router.push("/dashboard")
-        },
-        onError: (ctx) => {
-          setLoading(false)
-          alert(ctx.error.message)
-        },
+    try {
+      const callbackURL = process.env.BETTER_AUTH_URL
+        ? `${process.env.BETTER_AUTH_URL}/dashboard`
+        : "/dashboard"
+
+      const { data, error } = await authClient.signIn.email(
+        {
+          email,
+          password,
+          callbackURL,
+          rememberMe: false,
+        }
+      )
+
+      if (error) {
+        alert(error.message)
+        setLoading(false)
+        return
       }
-    )
+
+      router.push(callbackURL)
+    } catch (err: unknown) {
+      console.error(err)
+      alert("Ocorreu um erro ao realizar login. Tente novamente.")
+      setLoading(false)
+    }
   }
 
   return (

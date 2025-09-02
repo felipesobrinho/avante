@@ -3,8 +3,9 @@ import { create } from "zustand"
 
 type OrdersState = {
   orders: Order[]
-  fetchOrders: () => Promise<void>
   isLoading: boolean,
+  error: string | null,
+  fetchOrders: () => Promise<void>
   addOrder: (order: NewOrder) => Promise<void>
   deleteOrder: (id: string) => Promise<void>;
   editOrder: (order: UpdateOrderInput) => Promise<void>;
@@ -13,6 +14,7 @@ type OrdersState = {
 export const useOrdersStore = create<OrdersState>((set) => ({
   orders: [],
   isLoading: false,
+  error: null,
 
     fetchOrders: async () => {
     set({ isLoading: true });
@@ -20,8 +22,12 @@ export const useOrdersStore = create<OrdersState>((set) => ({
       const res = await fetch("/api/pedidos");
       const data: Order[] = await res.json();
       set({ orders: data });
-    } catch (error) {
-      console.error("Erro ao buscar pedidos:", error);
+      } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     } finally {
       set({ isLoading: false });
     }
@@ -50,8 +56,12 @@ export const useOrdersStore = create<OrdersState>((set) => ({
       set((state) => ({
         orders: state.orders.filter((order) => order.id !== id),
       }));
-    } catch (error) {
-      console.error("Erro ao deletar pedido:", error);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 
@@ -71,8 +81,12 @@ export const useOrdersStore = create<OrdersState>((set) => ({
           order.id === data.id ? { ...order, ...updatedData } : order
         ),
       }));
-    } catch (error) {
-      console.error("Erro ao editar pedido:", error);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 }))

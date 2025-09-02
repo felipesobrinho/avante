@@ -3,8 +3,9 @@ import { create } from "zustand"
 
 type CustomerState = {
   customers: Customer[]
-  fetchCustomers: () => Promise<void>
   isLoading: boolean,
+  error: string | null,
+  fetchCustomers: () => Promise<void>
   addCustomer: (customer: Omit<Customer, "id" | "createdAt" | "updatedAt">) => Promise<void>
   deleteCustomer: (id: string) => Promise<void>;
   editCustomer: (customer: Omit<Customer, "createdAt" | "updatedAt">) => Promise<void>;
@@ -13,6 +14,7 @@ type CustomerState = {
 export const useCustomersStore = create<CustomerState>((set) => ({
   customers: [],
   isLoading: false,
+  error: null,
 
   fetchCustomers: async () => {
     set({ isLoading: true });
@@ -20,8 +22,12 @@ export const useCustomersStore = create<CustomerState>((set) => ({
       const res = await fetch("/api/clientes");
       const data: Customer[] = await res.json();
       set({ customers: data });
-    } catch (error) {
-      console.error("Erro ao buscar clientes:", error);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     } finally {
       set({ isLoading: false });
     }
@@ -50,8 +56,12 @@ export const useCustomersStore = create<CustomerState>((set) => ({
       set((state) => ({
         customers: state.customers.filter((customer) => customer.id !== id),
       }));
-    } catch (error) {
-      console.error("Erro ao deletar cliente:", error);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 
@@ -71,8 +81,12 @@ export const useCustomersStore = create<CustomerState>((set) => ({
           customer.id === data.id ? { ...customer, ...updatedData } : customer
         ),
       }));
-    } catch (error) {
-      console.error("Erro ao editar cliente:", error);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 }))

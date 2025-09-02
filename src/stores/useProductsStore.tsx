@@ -43,7 +43,11 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       const data = await res.json()
       set({ products: [...get().products, data] })
     } catch (err: unknown) {
-      set({ error: (err as Error).message })
+      if (err instanceof Error) {
+        set({ error: err.message })
+      } else {
+        set({ error: "Erro desconhecido" })
+      }
     }
   },
 

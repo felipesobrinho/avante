@@ -76,7 +76,7 @@ model Verification {
 
 model Orders {
   id          String   @id @default(uuid())
-  description String
+  description String?
   quantity    Int
   totalPrice  Int
   status      String

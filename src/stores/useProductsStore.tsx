@@ -37,7 +37,10 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       const res = await fetch("/api/produtos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProduct),
+        body: JSON.stringify({
+        ...newProduct,
+        categoryId: newProduct.categoryId
+      }),
       })
       if (!res.ok) throw new Error("Erro ao adicionar produto")
       const data = await res.json()
@@ -75,7 +78,10 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       const res = await fetch(`/api/produtos`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          categoryId: data.categoryId
+        }),
       })
       if (!res.ok) throw new Error("Erro ao editar produto")
 

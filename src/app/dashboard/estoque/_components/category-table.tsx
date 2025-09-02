@@ -87,19 +87,6 @@ export function CategoryTable() {
             cell: ({ row }) => <div>{row.getValue("name")}</div>,
         },
         {
-            accessorKey: "description",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Descrição
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => <div>{row.getValue("description")}</div>,
-        },
-        {
             id: "actions",
             enableHiding: false,
             cell: ({ row }) => {

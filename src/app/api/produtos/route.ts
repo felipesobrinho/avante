@@ -13,6 +13,13 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const data = await request.json()
 
+  if (!data.categoryId) {
+    return NextResponse.json(
+      { error: "Id da categoria é obrigatório" },
+      { status: 400 }
+    )
+  }
+
   const newProduct = await prisma.products.create({
     data: {
       name: data.name,
@@ -30,6 +37,13 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const data = await request.json()
+
+  if (!data.categoryId) {
+    return NextResponse.json(
+      { error: "Id da categoria é obrigatório" },
+      { status: 400 }
+    )
+  }
 
   const updatedProduct = await prisma.products.update({
     where: { id: data.id },

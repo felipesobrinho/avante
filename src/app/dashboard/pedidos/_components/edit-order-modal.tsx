@@ -21,7 +21,7 @@ import { CreateCustomerModal } from "../../clientes/_components/create-customer-
 
 const orderSchema = z.object({
   id: z.string(),
-  description: z.string().min(1),
+  description: z.string().optional(),
   quantity: z.number().min(1),
   totalPrice: z.number().min(0),
   status: z.enum(["pendente", "pago", "entregue"]),
@@ -55,7 +55,7 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
             setValue("orderDay", new Date(order.orderDay))
             setValue("status", order.status)
             setValue("customerId", order.customerId)
-            setValue("productId", order.productId) // 👈 agora produto
+            setValue("productId", order.productId)
           }
         })
         .catch(err => console.error(err))
@@ -83,6 +83,7 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
           <DialogTitle>Editar Pedido</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
           <Label>Cliente</Label>
           <Controller
             name="customerId"
@@ -123,16 +124,13 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
               </Select>
             )}
           />
-
-          <Label htmlFor="description">Descrição</Label>
-          <Input placeholder="Descrição" {...register("description")} />
-
           <Label htmlFor="quantity">Quantidade</Label>
           <Input type="number" placeholder="Quantidade" {...register("quantity", { valueAsNumber: true })} />
 
-          <Label htmlFor="totalPrice">Preço Total</Label>
-          <Input type="number" step="0.01" placeholder="Preço Total" {...register("totalPrice", { valueAsNumber: true })} />
+          <Label htmlFor="totalPrice">Valor Total</Label>
+          <Input type="number" step="0.01" placeholder="Valor Total" {...register("totalPrice", { valueAsNumber: true })} />
 
+          <Label htmlFor="orderDay">Data do Pedido</Label>
           <Controller
             name="orderDay"
             control={control}
@@ -162,6 +160,7 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
             )}
           />
 
+          <Label htmlFor="status">Status</Label>
           <Controller
             name="status"
             control={control}
@@ -178,6 +177,10 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
               </Select>
             )}
           />
+
+          
+          <Label htmlFor="description">Observação</Label>
+          <Input placeholder="Observação" {...register("description")} />
 
           <Button type="submit">Salvar</Button>
         </form>

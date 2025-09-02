@@ -2,9 +2,11 @@
 
 import * as React from "react"
 import {
+  IconCategory,
   IconChartBar,
   IconDashboard,
   IconListDetails,
+  IconPackage,
   IconUsers,
 } from "@tabler/icons-react"
 
@@ -29,22 +31,6 @@ const data = {
       url: "/dashboard",
       icon: IconDashboard,
     },
-     {
-      title: "Estoque",
-      url: "#",
-      icon: IconListDetails,
-      submenu: true,
-      children: [
-        {
-          title: "Produtos",
-          url: "/dashboard/estoque/produtos",
-        },
-        {
-          title: "Categorias",
-          url: "/dashboard/estoque/categorias",
-        },
-      ],
-    },
     {
       title: "Pedidos",
       url: "/dashboard/pedidos",
@@ -54,6 +40,24 @@ const data = {
       title: "Clientes",
       url: "/dashboard/clientes",
       icon: IconUsers,
+    },
+    {
+      title: "Estoque",
+      url: "/dashboard/estoque",
+      icon: IconListDetails,
+      submenu: true,
+      children: [
+        {
+          title: "Produtos",
+          url: "/dashboard/estoque/produtos",
+          icon: IconPackage,
+        },
+        {
+          title: "Categorias",
+          url: "/dashboard/estoque/categorias",
+          icon: IconCategory,
+        },
+      ],
     },
   ],
   // navSecondary: [
@@ -101,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />        
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

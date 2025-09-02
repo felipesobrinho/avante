@@ -8,10 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCategoriesStore } from "@/stores/useCategoriesStore";
 
 const productSchema = z.object({
   name: z.string().min(1),
   price: z.number().min(0),
+  categoryId: z.string().min(1),
   measure: z.string().min(1),
 });
 
@@ -19,9 +22,10 @@ type ProductFormData = z.infer<typeof productSchema>;
 
 export function CreateProductModal() {
   const { addProduct } = useProductsStore();
+  const { categories, fetchCategories } = useCategoriesStore();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormData>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema)
   });
 
@@ -30,6 +34,10 @@ export function CreateProductModal() {
     reset();
     setModalOpen(false);
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
@@ -44,6 +52,26 @@ export function CreateProductModal() {
           <Label>Nome</Label>
           <Input {...register("name")} />
           {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+
+          <Label>Categoria</Label>
+          <Select
+            onValueChange={(value) => setValue("categoryId", value, { shouldValidate: true })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione uma categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.categoryId && (
+            <p className="text-red-500 text-sm font-bold">{errors.categoryId.message}</p>
+          )}
+
 
           <Label>Preço</Label>
           <Input type="number" step="0.01" {...register("price", { valueAsNumber: true })} />

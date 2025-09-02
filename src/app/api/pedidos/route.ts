@@ -69,7 +69,7 @@ export async function PUT(request: NextRequest) {
   return NextResponse.json(updatedOrder)
 }
 
-// DELETE - excluir pedido (estoque não volta, mas pode ser adicionado se quiser)
+// excluir pedido (pode ser adicionado: estoque voltar)
 export async function DELETE(request: NextRequest) {
   const data = await request.json()
 

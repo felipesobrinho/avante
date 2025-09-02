@@ -30,7 +30,7 @@ import { CreateCustomerModal } from "../../clientes/_components/create-customer-
 import { useProductsStore } from "@/stores/useProductsStore"
 
 const orderSchema = z.object({
-  description: z.string().min(1),
+  description: z.string().optional(),
   quantity: z.number().min(1),
   totalPrice: z.number().min(0),
   status: z.enum(["pendente", "pago", "entregue"]),
@@ -129,23 +129,21 @@ export function OrderModal() {
             <p className="text-red-500 text-sm font-bold">{errors.productId.message}</p>
           )}
 
-
-          <Label htmlFor="description">Descrição</Label>
-          <Input placeholder="Descrição" {...register("description")} />
           <Label htmlFor="quantity">Quantidade</Label>
           <Input
             type="number"
             placeholder="Quantidade"
             {...register("quantity", { valueAsNumber: true })}
           />
-          <Label htmlFor="totalPrice">Valor</Label>
+          <Label htmlFor="totalPrice">Valor Total</Label>
           <Input
             type="number"
             step="0.01"
-            placeholder="Valor"
+            placeholder="Valor Total"
             {...register("totalPrice", { valueAsNumber: true })}
           />
 
+          <Label htmlFor="orderDay">Data do Pedido</Label>
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -172,6 +170,7 @@ export function OrderModal() {
             </PopoverContent>
           </Popover>
 
+          <Label htmlFor="status">Status</Label>
           <Select
             onValueChange={(value) =>
               setValue("status", value as "pendente" | "pago" | "entregue")
@@ -190,6 +189,9 @@ export function OrderModal() {
           {errors.orderDay && (
             <p className="text-red-500 text-sm font-bold">{errors.orderDay.message}</p>
           )}
+
+          <Label htmlFor="description">Observação</Label>
+          <Input placeholder="Observação" {...register("description")} />
 
           <Button type="submit">Cadastrar Pedido</Button>
         </form>

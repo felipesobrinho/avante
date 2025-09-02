@@ -7,8 +7,9 @@ export interface Order {
   productId: string
   product: {
     name: string
+    measure: string
   }
-  description: string
+  description?: string
   quantity: number
   totalPrice: number
   status: "pendente" | "pago" | "entregue"

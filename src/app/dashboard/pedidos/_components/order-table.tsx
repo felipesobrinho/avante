@@ -47,6 +47,8 @@ export function OrdersTable() {
   const [rowSelection, setRowSelection] = useState({});
   const { orders, fetchOrders, deleteOrder, isLoading } = useOrdersStore();
 
+  console.log(orders)
+
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
@@ -103,9 +105,10 @@ export function OrdersTable() {
       cell: ({ row }) => <div>{row.getValue("productName")}</div>,
     },
     {
-      accessorKey: "description",
-      header: "Descrição",
-      cell: ({ row }) => <div>{row.getValue("description")}</div>,
+      id: "productMeasure",
+      header: "Medida:",
+      accessorFn: (row) => row.product?.measure ?? "-",
+      cell: ({ row }) => <div>{row.getValue("productMeasure")}</div>,
     },
     {
       accessorKey: "quantity",
@@ -171,6 +174,11 @@ export function OrdersTable() {
         </Button>
       ),
       cell: ({ row }) => <div className="lowercase">{row.getValue("status")}</div>,
+    },
+    {
+      accessorKey: "description",
+      header: "Observação:",
+      cell: ({ row }) => <div>{row.getValue("description")}</div>,
     },
     {
       id: "actions",
@@ -290,9 +298,9 @@ export function OrdersTable() {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     ))}
                   </TableRow>

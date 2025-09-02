@@ -46,6 +46,8 @@ export function ProductTable() {
     const [rowSelection, setRowSelection] = useState({});
     const { products, fetchProducts, deleteProduct, isLoading } = useProductsStore();
 
+    console.log(products)
+
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
@@ -80,11 +82,25 @@ export function ProductTable() {
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Cliente
+                    Produto
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             ),
             cell: ({ row }) => <div>{row.getValue("name")}</div>,
+        },
+        {
+            id: "categoryName",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Categoria
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            accessorFn: (row) => row.category?.name ?? "",
+            cell: ({ row }) => <div>{row.getValue("categoryName")}</div>,
         },
         {
             accessorKey: "price",
@@ -100,17 +116,17 @@ export function ProductTable() {
             cell: ({ row }) => <div>R$ {Number(row.getValue("price")).toFixed(2)}</div>,
         },
         {
-          accessorKey: "measure",
-          header: ({ column }) => (
-              <Button
-                  variant="ghost"
-                  onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-              >
-                  Medida
-                  <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("measure")}</div>,
+            accessorKey: "measure",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Medida
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => <div>{row.getValue("measure")}</div>,
         },
         {
             id: "actions",

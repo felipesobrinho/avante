@@ -6,6 +6,9 @@ export interface Product {
   price: number
   stock?: number | null
   categoryId?: string | null
+  category: {
+    name: string
+  }
   createdAt: Date
   updatedAt: Date
 }

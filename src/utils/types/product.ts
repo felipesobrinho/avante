@@ -3,7 +3,7 @@ export interface Product {
   name: string
   description?: string
   measure?: string
-  price: number
+  price?: number
   stock?: number | null
   categoryId?: string | null
   category: {

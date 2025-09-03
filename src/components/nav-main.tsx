@@ -41,7 +41,7 @@ export function NavMain({
                 <SidebarMenuItem key={item.title}>
                   <Link
                     href={item.url}
-                    className="flex items-center gap-4"
+                    className="flex items-center gap-4 hover:bg-muted hover:font-bold p-2 rounded-2xl "
                   >
                     {item.icon && <item.icon />}
                     {item.title}
@@ -53,7 +53,7 @@ export function NavMain({
                 <SidebarMenuItem key={item.title}>
                   <Accordion type="single" collapsible>
                     <AccordionItem value={item.title}>
-                      <AccordionTrigger className="flex items-center justify-start font-light ">
+                      <AccordionTrigger className="flex items-center justify-start font-normal hover:bg-muted hover:font-bold p-2 rounded-2xl ">
                         {item.icon && <item.icon />}
                         {item.title}
                       </AccordionTrigger>
@@ -62,7 +62,7 @@ export function NavMain({
                           <Link
                             key={child.title}
                             href={child.url}
-                            className="text-sm text-muted-foreground hover:text-primary flex items-center gap-2"
+                            className="text-sm text-muted-foreground hover:text-primary flex items-center gap-2 p-2 hover:font-bold hover:bg-muted rounded-2xl w-full"
                           >
                             {child.icon && <child.icon className="w-4 h-4" />}
                             {child.title}

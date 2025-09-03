@@ -98,7 +98,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="/dashboard">
                 <Wrench />
-                <span className="text-base font-semibold">Avante</span>
+                <span className="text-2xl font-semibold">Avante</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useCategoriesStore } from "@/stores/useCategoriesStore";
 
 const categorySchema = z.object({
-    name: z.string().min(5, "Nome da categoria é obrigatório"),
+    name: z.string().min(0, "Nome da categoria é obrigatório"),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;

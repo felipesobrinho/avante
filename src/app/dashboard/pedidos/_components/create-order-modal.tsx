@@ -28,6 +28,7 @@ import { Label } from "@/components/ui/label"
 import { useCustomersStore } from "@/stores/useCustomerStore"
 import { CreateCustomerModal } from "../../clientes/_components/create-customer-modal"
 import { useProductsStore } from "@/stores/useProductsStore"
+import { CreateProductModal } from "../../estoque/_components/create-product-modal"
 
 const orderSchema = z.object({
   description: z.string().optional(),
@@ -120,9 +121,10 @@ export function OrderModal() {
             <SelectContent>
               {products.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
-                  {p.name} - {p.measure} ({p.price} R$)
+                  {p.name} - {p.measure}
                 </SelectItem>
               ))}
+              <CreateProductModal />
             </SelectContent>
           </Select>
           {errors.productId && (

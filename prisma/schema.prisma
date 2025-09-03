@@ -78,8 +78,8 @@ model Orders {
   id          String   @id @default(uuid())
   description String?
   quantity    Int
-  totalPrice  Int
-  status      String
+  totalPrice  Int?
+  status      String @default("PENDING")
   orderDay    DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -109,10 +109,10 @@ model Products {
   id             String   @id @default(uuid())
   name           String
   measure        String
-  price          Decimal
 
   productionType ProductionType @default(SOB_ENCOMENDA)
   stock          Int?           // só será usado se productionType = EM_ESTOQUE
+  price          Decimal?
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

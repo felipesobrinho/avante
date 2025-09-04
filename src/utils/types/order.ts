@@ -8,6 +8,7 @@ export interface Order {
   product: {
     name: string
     measure: string
+    productionType: string
   }
   description?: string
   quantity: number

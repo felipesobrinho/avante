@@ -111,6 +111,12 @@ export function OrdersTable() {
       cell: ({ row }) => <div>{row.getValue("productMeasure")}</div>,
     },
     {
+      id: "productionType",
+      header: "Tipo de Produção:",
+      accessorFn: (row) => row.product?.productionType ?? "-",
+      cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
+    },
+    {
       accessorKey: "quantity",
       header: ({ column }) => (
         <Button

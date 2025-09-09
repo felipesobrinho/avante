@@ -5,14 +5,18 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
   const { pathname } = request.nextUrl;
 
-  if (!sessionCookie) {
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+  if (pathname === "/dashboard") {
+    if (!sessionCookie) {
+      const loginUrl = new URL("/login", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
-  if (pathname === "/login" || pathname === "/cadastro") {
-    const dashboardUrl = new URL("/dashboard", request.url);
-    return NextResponse.redirect(dashboardUrl);
+  if (sessionCookie) {
+    if (pathname === "/login" || pathname === "/cadastro") {
+      const dashboardUrl = new URL("/dashboard", request.url);
+      return NextResponse.redirect(dashboardUrl);
+    }
   }
 
   return NextResponse.next();

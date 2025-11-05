@@ -33,7 +33,7 @@ import ItemsRepeater from "./item-repeater"
 const itemSchema = z.object({ 
   productId: z.string().min(1, "Selecione um produto"), 
   quantity: z.number().min(1, "Qtd mínima 1"), 
-  unitPrice: z.number().optional()
+  unitPrice: z.number().min(1, "Val. Unit. mínimo 1")
 })
 
 const orderSchema = z.object({

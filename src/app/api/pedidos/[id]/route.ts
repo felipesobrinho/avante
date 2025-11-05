@@ -1,4 +1,3 @@
-// app/api/pedidos/[id]/route.ts
 import { NextResponse } from "next/server"
 import { PrismaClient } from "../../../../../generated/prisma"
 
@@ -6,10 +5,12 @@ const prisma = new PrismaClient()
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await ctx.params
+
   const order = await prisma.orders.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       customer: true,
       items: { include: { product: true } },

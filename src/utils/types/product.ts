@@ -17,3 +17,6 @@ export interface Product {
 export type NewProduct = Omit<Product, "id" | "createdAt" | "updatedAt" | "category">
 
 export type UpdateProductInput = Omit<Product, "createdAt" | "updatedAt" | "category">
+
+export type ProductLite = Pick<Product, "id" | "name" | "measure" | "productionType">
+

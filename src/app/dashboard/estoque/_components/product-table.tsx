@@ -100,19 +100,19 @@ export function ProductTable() {
             accessorFn: (row) => row.category?.name ?? "",
             cell: ({ row }) => <div>{row.getValue("categoryName")}</div>,
         },
-        {
-            accessorKey: "price",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Preço
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => <div>R$ {Number(row.getValue("price")).toFixed(2)}</div>,
-        },
+        // {
+        //     accessorKey: "price",
+        //     header: ({ column }) => (
+        //         <Button
+        //             variant="ghost"
+        //             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        //         >
+        //             Preço
+        //             <ArrowUpDown className="ml-2 h-4 w-4" />
+        //         </Button>
+        //     ),
+        //     cell: ({ row }) => <div>R$ {Number(row.getValue("price")).toFixed(2)}</div>,
+        // },
         {
             accessorKey: "measure",
             header: ({ column }) => (

@@ -23,11 +23,12 @@ import { useCustomersStore } from "@/stores/useCustomerStore"
 import { useProductsStore } from "@/stores/useProductsStore"
 import { CreateCustomerModal } from "../../clientes/_components/create-customer-modal"
 import ItemsRepeater from "./item-repeater"
+import { OrderItemInput } from "@/utils/types/order"
 
 const itemSchema = z.object({
   productId: z.string().min(1, "Selecione um produto"),
   quantity: z.number().min(1, "Qtd mínima 1"),
-  unitPrice: z.number().optional(),
+  unitPrice: z.number().min(1, "Val. Unit. mínimo 1")
 })
 
 const orderSchema = z.object({
@@ -96,7 +97,7 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
         setValue(
           "items",
           Array.isArray(order.items)
-            ? order.items.map((it: any) => ({
+            ? order.items.map((it: OrderItemInput ) => ({
                 productId: it.productId,
                 quantity: Number(it.quantity ?? 1),
                 unitPrice: it.unitPrice != null ? Number(it.unitPrice) : undefined,

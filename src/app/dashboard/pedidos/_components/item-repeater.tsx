@@ -9,10 +9,10 @@ export default function ItemsRepeater({
   onChange,
 }: {
   products: { id: string; name: string; measure?: string | null}[]
-  value: Array<{ productId: string; quantity: number; unitPrice?: number; discount?: number }>
-  onChange: (v: Array<{ productId: string; quantity: number; unitPrice?: number; discount?: number }>) => void
+  value: Array<{ productId: string; quantity: number; unitPrice: number; }>
+  onChange: (v: Array<{ productId: string; quantity: number; unitPrice: number; }>) => void
 }) {
-  const add = () => onChange([...value, { productId: "", quantity: 1 }])
+  const add = () => onChange([...value, { productId: "", quantity: 1, unitPrice: 1 }])
   const remove = (idx: number) => onChange(value.filter((_, i) => i !== idx))
   const setAt = (idx: number, patch: Partial<(typeof value)[number]>) =>
     onChange(value.map((it, i) => (i === idx ? { ...it, ...patch } : it)))
@@ -35,8 +35,8 @@ export default function ItemsRepeater({
         )
 
         return (
-          <div key={idx} className="grid grid-cols-12 gap-2 items-end">
-            <div className="col-span-6">
+          <div key={idx} className="flex justify-center items-end gap-4">
+            <div>
               <Label>Produto</Label>
               <Select
                 value={it.productId}
@@ -53,7 +53,7 @@ export default function ItemsRepeater({
               </Select>
             </div>
 
-            <div className="col-span-2">
+            <div>
               <Label>Qtd</Label>
               <Input
                 type="number"
@@ -64,8 +64,8 @@ export default function ItemsRepeater({
               />
             </div>
 
-            <div className="col-span-2">
-              <Label>Unit (opc.)</Label>
+            <div>
+              <Label>Val. Unit</Label>
               <Input
                 type="number"
                 min={1}
@@ -75,9 +75,7 @@ export default function ItemsRepeater({
               />
             </div>
             
-            <div className="col-span-12">
-              <Button type="button" variant="ghost" onClick={() => remove(idx)}>Remover</Button>
-            </div>
+            <Button className="m-0" type="button" variant="destructive" onClick={() => remove(idx)}>Remover</Button>
           </div>
         )
       })}

@@ -1,55 +1,129 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "../../../../generated/prisma"
+import { PrismaClient, Prisma } from "../../../../generated/prisma"
+import { OrderItemInput } from "@/utils/types/order"
 
 const prisma = new PrismaClient()
-
-type OrderItemInput = {
-  productId: string
-  quantity: number
-  unitPrice?: number
-}
 
 type EnrichedItem = OrderItemInput & {
   product?: {
     id: string
-    price: any | null
+    price: number | null
     productionType: "SOB_ENCOMENDA" | "EM_ESTOQUE"
     stock: number | null
   }
 }
 
-function toNumber(n: any) { return Number(n ?? 0) }
+type OrderWithIncludes = Prisma.OrdersGetPayload<{
+  include: { customer: true; items: { include: { product: true } } }
+}>
+
+type OrderItemNormalized = {
+  id: string
+  orderId: string
+  productId: string
+  quantity: number
+  unitPrice: number
+  product: {
+    id: string
+    name: string
+    measure: string
+    productionType: "SOB_ENCOMENDA" | "EM_ESTOQUE"
+    price: number | null
+    stock: number | null
+  } | null
+}
+
+type OrderNormalized = {
+  id: string
+  description: string | null
+  totalPrice: number
+  status: string
+  orderDay: Date | null
+  createdAt: Date
+  updatedAt: Date
+  customerId: string
+  customer: {
+    id: string
+    name: string
+    address: string
+    phone: string
+    createdAt: Date
+    updatedAt: Date
+  } | null
+  items: OrderItemNormalized[]
+}
+
+function toNumber(n: unknown): number {
+  if (typeof n === "number") return Number.isFinite(n) ? n : 0
+  if (typeof n === "string") {
+    const v = Number(n)
+    return Number.isFinite(v) ? v : 0
+  }
+  if (typeof n === "bigint") return Number(n)
+  if (n instanceof Prisma.Decimal) return n.toNumber()
+  return 0
+}
 
 async function enrichItems(items: OrderItemInput[]): Promise<EnrichedItem[]> {
-  const ids = [...new Set(items.map(i => i.productId))]
+  const ids = [...new Set(items.map((i) => i.productId))]
   const products = await prisma.products.findMany({
     where: { id: { in: ids } },
     select: { id: true, price: true, productionType: true, stock: true },
   })
-  const map = new Map(products.map(p => [p.id, p]))
-  return items.map(i => {
+  const map = new Map(products.map((p) => [p.id, p]))
+  return items.map((i) => {
     const p = map.get(i.productId)
     return {
       ...i,
       unitPrice: i.unitPrice ?? toNumber(p?.price),
-      product: p ? {
-        id: p.id,
-        price: p.price,
-        productionType: p.productionType,
-        stock: (p.stock as unknown as number) ?? null,
-      } : undefined,
+      product: p
+        ? {
+            id: p.id,
+            price: p.price != null ? toNumber(p.price) : null,
+            productionType: p.productionType as "SOB_ENCOMENDA" | "EM_ESTOQUE",
+            stock: p.stock ?? null,
+          }
+        : undefined,
     }
   })
 }
 
-function normalizeOrders(orders: any) {
-  return orders.map(o => ({
-    ...o,
+function normalizeOrders(orders: OrderWithIncludes[]): OrderNormalized[] {
+  return orders.map((o): OrderNormalized => ({
+    id: o.id,
+    description: o.description ?? null,
     totalPrice: toNumber(o.totalPrice),
-    items: o.items.map((it: any) => ({
-      ...it,
+    status: o.status,
+    orderDay: (o.orderDay as Date | null) ?? null,
+    createdAt: o.createdAt,
+    updatedAt: o.updatedAt,
+    customerId: o.customerId,
+    customer: o.customer
+      ? {
+          id: o.customer.id,
+          name: o.customer.name,
+          address: o.customer.address,
+          phone: o.customer.phone,
+          createdAt: o.customer.createdAt,
+          updatedAt: o.customer.updatedAt,
+        }
+      : null,
+    items: o.items.map((it): OrderItemNormalized => ({
+      id: it.id,
+      orderId: it.orderId,
+      productId: it.productId,
+      quantity: it.quantity,
       unitPrice: toNumber(it.unitPrice),
-      product: it.product ? { ...it.product, price: toNumber(it.product.price) } : null,
+      product: it.product
+        ? {
+            id: it.product.id,
+            name: it.product.name,
+            measure: it.product.measure,
+            productionType: it.product.productionType as "SOB_ENCOMENDA" | "EM_ESTOQUE",
+            price: it.product.price != null ? toNumber(it.product.price) : null,
+            stock: it.product.stock ?? null,
+          }
+        : null,
     })),
   }))
 }
@@ -98,7 +172,7 @@ export async function POST(req: NextRequest) {
         status: data.status ?? "PENDING",
         customerId: data.customerId,
         items: {
-          create: items.map(it => ({
+          create: items.map((it) => ({
             productId: it.productId,
             quantity: it.quantity,
             unitPrice: toNumber(it.unitPrice),
@@ -127,8 +201,8 @@ export async function PUT(req: NextRequest) {
   const raw: OrderItemInput[] = Array.isArray(data.items) ? data.items : []
   const items = await enrichItems(raw)
 
-  const prevByProd = new Map(order.items.map(it => [it.productId, it]))
-  const nextByProd = new Map(items.map(it => [it.productId, it]))
+  const prevByProd = new Map(order.items.map((it) => [it.productId, it]))
+  const nextByProd = new Map(items.map((it) => [it.productId, it]))
 
   for (const [pid, next] of nextByProd.entries()) {
     const prev = prevByProd.get(pid)
@@ -162,7 +236,7 @@ export async function PUT(req: NextRequest) {
 
     await tx.orderItems.deleteMany({ where: { orderId: data.id } })
     await tx.orderItems.createMany({
-      data: items.map(it => ({
+      data: items.map((it) => ({
         orderId: data.id,
         productId: it.productId,
         quantity: it.quantity,

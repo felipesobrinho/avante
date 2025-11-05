@@ -46,8 +46,6 @@ export function ProductTable() {
     const [rowSelection, setRowSelection] = useState({});
     const { products, fetchProducts, deleteProduct, isLoading } = useProductsStore();
 
-    console.log(products)
-
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);

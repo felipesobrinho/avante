@@ -47,11 +47,11 @@ export function OrdersTable() {
   const [rowSelection, setRowSelection] = useState({});
   const { orders, fetchOrders, deleteOrder, isLoading } = useOrdersStore();
 
-  console.log(orders)
-
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  const currency = (n: unknown) => `R$ ${Number(n ?? 0).toFixed(2)}`
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -62,15 +62,13 @@ export function OrdersTable() {
             table.getIsAllPageRowsSelected() ||
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Selecionar Todos"
+          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Selecionar Linha"
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
         />
       ),
       enableSorting: false,
@@ -88,46 +86,50 @@ export function OrdersTable() {
         </Button>
       ),
       accessorFn: (row) => row.customer?.name ?? "",
-      cell: ({ row }) => <div>{row.getValue("customerName")}</div>,
+      cell: ({ row }) => <div className="font-medium">{row.getValue("customerName")}</div>,
     },
     {
-      id: "productName",
+      id: "items",
+      header: "Itens",
+      accessorFn: (row) => row.items?.length ?? 0,
+      cell: ({ row }) => {
+        const items = row.original.items ?? []
+        if (!items.length) return <div className="text-muted-foreground">—</div>
+        const shown = items.slice(0, 3)
+        const rest = items.length - shown.length
+        return (
+          <div className="space-y-1">
+            {shown.map((it, i) => (
+              <div key={i} className="text-sm">
+                <span className="font-medium">{it.product?.name ?? "Produto"}</span>
+                {it.product?.measure && (
+                  <span className="text-muted-foreground"> ({it.product.measure})</span>
+                )}
+                <span className="mx-1">× {it.quantity}</span>
+                <span className="text-muted-foreground">— {currency(it.unitPrice)}</span>
+              </div>
+            ))}
+            {rest > 0 && (
+              <div className="text-xs text-muted-foreground">+ {rest} item(ns)</div>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      id: "itemsCount",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Produto
+          Qtd. Itens
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      accessorFn: (row) => row.product?.name ?? "",
-      cell: ({ row }) => <div>{row.getValue("productName")}</div>,
-    },
-    {
-      id: "productMeasure",
-      header: "Medida:",
-      accessorFn: (row) => row.product?.measure ?? "-",
-      cell: ({ row }) => <div>{row.getValue("productMeasure")}</div>,
-    },
-    {
-      id: "productionType",
-      header: "Tipo de Produção:",
-      accessorFn: (row) => row.product?.productionType ?? "-",
-      cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
-    },
-    {
-      accessorKey: "quantity",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Quantidade
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div>{row.getValue("quantity")}</div>,
+      accessorFn: (row) =>
+        (row.items ?? []).reduce((acc, it) => acc + Number(it.quantity ?? 0), 0),
+      cell: ({ row }) => <div>{row.getValue("itemsCount")}</div>,
     },
     {
       accessorKey: "totalPrice",
@@ -140,18 +142,7 @@ export function OrdersTable() {
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <div>R$ {Number(row.getValue("totalPrice")).toFixed(2)}</div>
-      ),
-    },
-    {
-      id: "unitPrice",
-      header: "Preço Unitário",
-      cell: ({ row }) => {
-        const total = Number(row.original.totalPrice);
-        const qty = Number(row.original.quantity);
-        return <div>R$ {(qty > 0 ? total / qty : 0).toFixed(2)}</div>;
-      },
+      cell: ({ row }) => <div className="font-medium">{currency(row.getValue("totalPrice"))}</div>,
     },
     {
       accessorKey: "orderDay",
@@ -165,7 +156,11 @@ export function OrdersTable() {
         </Button>
       ),
       cell: ({ row }) => (
-        <div>{format(row.getValue("orderDay"), "dd/MM/yyyy")}</div>
+        <div>
+          {row.getValue("orderDay")
+            ? format(row.getValue("orderDay"), "dd/MM/yyyy")
+            : "—"}
+        </div>
       ),
     },
     {
@@ -183,15 +178,18 @@ export function OrdersTable() {
     },
     {
       accessorKey: "description",
-      header: "Observação:",
-      cell: ({ row }) => <div>{row.getValue("description")}</div>,
+      header: "Observação",
+      cell: ({ row }) => (
+        <div className="truncate max-w-[28ch]" title={row.getValue("description") ?? ""}>
+          {row.getValue("description") ?? "—"}
+        </div>
+      ),
     },
     {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const order = row.original;
-
+        const order = row.original
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -202,9 +200,7 @@ export function OrdersTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(order.id)}
-              >
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(order.id)}>
                 Copiar ID do Pedido
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -215,19 +211,17 @@ export function OrdersTable() {
                 onClick={() => deleteOrder(order.id)}
                 className="text-red-500"
               >
-                <Button
-                  variant="outline"
-                  className="w-full flex justify-center"
-                >
+                <Button variant="outline" className="w-full flex justify-center">
                   <Trash className="mr-2 h-4 w-4" /> Excluir
                 </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        );
+        )
       },
     },
-  ];
+  ]
+
 
   const table = useReactTable({
     data: orders,

@@ -1,25 +1,31 @@
-import { NextRequest, NextResponse } from "next/server"
+// app/api/pedidos/[id]/route.ts
+import { NextResponse } from "next/server"
 import { PrismaClient } from "../../../../../generated/prisma"
 
 const prisma = new PrismaClient()
 
 export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  _req: Request,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params
+  const order = await prisma.orders.findUnique({
+    where: { id: params.id },
+    include: {
+      customer: true,
+      items: { include: { product: true } },
+    },
+  })
 
-  try {
-    const order = await prisma.orders.findUnique({
-      where: { id },
-    })
+  if (!order) return NextResponse.json(null, { status: 404 })
 
-    if (!order) {
-      return NextResponse.json({ error: "Pedido não encontrado" }, { status: 404 })
-    }
-
-    return NextResponse.json(order)
-  } catch (error) {
-    return NextResponse.json({ error: "Erro ao buscar pedido" }, { status: 500 })
+  const normalized = {
+    ...order,
+    totalPrice: Number(order.totalPrice ?? 0),
+    items: order.items.map((it) => ({
+      ...it,
+      unitPrice: Number(it.unitPrice ?? 0),
+    })),
   }
+
+  return NextResponse.json(normalized)
 }

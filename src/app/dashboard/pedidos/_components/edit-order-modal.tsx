@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import * as z from "zod"
 import { CalendarIcon, Pencil } from "lucide-react"
@@ -18,54 +22,106 @@ import { Label } from "@/components/ui/label"
 import { useCustomersStore } from "@/stores/useCustomerStore"
 import { useProductsStore } from "@/stores/useProductsStore"
 import { CreateCustomerModal } from "../../clientes/_components/create-customer-modal"
+import ItemsRepeater from "./item-repeater"
+
+const itemSchema = z.object({
+  productId: z.string().min(1, "Selecione um produto"),
+  quantity: z.number().min(1, "Qtd mínima 1"),
+  unitPrice: z.number().optional(),
+})
 
 const orderSchema = z.object({
   id: z.string(),
   description: z.string().optional(),
-  quantity: z.number().min(1),
-  totalPrice: z.number().min(0),
   status: z.enum(["pendente", "pago", "entregue"]),
   orderDay: z.date({ error: "Selecione o dia do pedido!" }),
   customerId: z.string().min(1, "Selecione um cliente"),
-  productId: z.string().min(1, "Selecione um produto"),
+  items: z.array(itemSchema).min(1, "Adicione pelo menos um item"),
 })
 
 type OrderFormData = z.infer<typeof orderSchema>
 
+const compactItems = (items: OrderFormData["items"]) => {
+  const map = new Map<string, { productId: string; quantity: number; unitPrice?: number; }>()
+  for (const it of items) {
+    const key = it.productId
+    const prev = map.get(key)
+    if (!prev) {
+      map.set(key, { ...it })
+    } else {
+      map.set(key, {
+        productId: key,
+        quantity: (prev.quantity ?? 0) + (it.quantity ?? 0),
+        unitPrice: prev.unitPrice ?? it.unitPrice,
+      })
+    }
+  }
+  return Array.from(map.values())
+}
+
 export function EditOrderModal({ orderId }: { orderId: string }) {
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+
   const { customers, fetchCustomers } = useCustomersStore()
   const { products, fetchProducts } = useProductsStore()
-  const [modalOpen, setModalOpen] = useState(false)
   const { editOrder } = useOrdersStore()
-  const { register, handleSubmit, setValue, control, reset } = useForm<OrderFormData>({
-    resolver: zodResolver(orderSchema)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<OrderFormData>({
+    resolver: zodResolver(orderSchema),
+    defaultValues: { items: [] as OrderFormData["items"] },
   })
 
+  const items = watch("items")
+
   useEffect(() => {
-    if (orderId) {
-      fetch(`/api/pedidos/${orderId}`)
-        .then(res => res.json())
-        .then(order => {
-          if (order) {
-            setValue("id", order.id)
-            setValue("description", order.description)
-            setValue("quantity", order.quantity)
-            setValue("totalPrice", order.totalPrice)
-            setValue("orderDay", new Date(order.orderDay))
-            setValue("status", order.status)
-            setValue("customerId", order.customerId)
-            setValue("productId", order.productId)
-          }
-        })
-        .catch(err => console.error(err))
-    }
-    fetchCustomers()
-    fetchProducts()
-  }, [orderId, setValue, fetchCustomers, fetchProducts])
+  if (orderId) {
+    fetch(`/api/pedidos/${orderId}`)
+      .then((res) => res.json())
+      .then((order) => {
+        if (!order) return
+        setValue("id", order.id)
+        setValue("description", order.description ?? "")
+        setValue("status", order.status)
+        setValue("orderDay", order.orderDay ? new Date(order.orderDay) : new Date())
+        setValue("customerId", order.customerId)
+        setValue(
+          "items",
+          Array.isArray(order.items)
+            ? order.items.map((it: any) => ({
+                productId: it.productId,
+                quantity: Number(it.quantity ?? 1),
+                unitPrice: it.unitPrice != null ? Number(it.unitPrice) : undefined,
+              }))
+            : []
+        )
+      })
+      .catch(console.error)
+  }
+  fetchCustomers()
+  fetchProducts()
+}, [orderId, setValue, fetchCustomers, fetchProducts])
+
+  const setItems = (v: OrderFormData["items"]) => setValue("items", v, { shouldValidate: true })
 
   const onSubmit = async (data: OrderFormData) => {
-    await editOrder(data)
+    const merged = compactItems(data.items)
+    await editOrder({
+      id: data.id,
+      description: data.description,
+      status: data.status,
+      orderDay: data.orderDay!,
+      customerId: data.customerId,
+      items: merged,
+    })
     reset()
     setModalOpen(false)
   }
@@ -74,7 +130,7 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <Pencil className="text-gray-500" /> 
+          <Pencil className="text-gray-500" />
           <p className="hover:text-white text-yellow-500">Editar Pedido</p>
         </Button>
       </DialogTrigger>
@@ -82,7 +138,9 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
         <DialogHeader>
           <DialogTitle>Editar Pedido</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <input type="hidden" {...register("id")} />
 
           <Label>Cliente</Label>
           <Controller
@@ -104,33 +162,13 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
               </Select>
             )}
           />
+          {errors.customerId && <p className="text-red-500 text-sm font-bold">{errors.customerId.message}</p>}
 
-          <Label>Produto</Label>
-          <Controller
-            name="productId"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Produto" />
-                </SelectTrigger>
-                <SelectContent>
-                  {products.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} - R${p.price}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <Label htmlFor="quantity">Quantidade</Label>
-          <Input type="number" placeholder="Quantidade" {...register("quantity", { valueAsNumber: true })} />
+          <ItemsRepeater products={products} value={items ?? []} onChange={setItems} />
 
-          <Label htmlFor="totalPrice">Valor Total</Label>
-          <Input type="number" step="0.01" placeholder="Valor Total" {...register("totalPrice", { valueAsNumber: true })} />
+          {errors.items && <p className="text-red-500 text-sm font-bold">{errors.items.message as string}</p>}
 
-          <Label htmlFor="orderDay">Data do Pedido</Label>
+          <Label>Data do Pedido</Label>
           <Controller
             name="orderDay"
             control={control}
@@ -159,8 +197,9 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
               </Popover>
             )}
           />
+          {errors.orderDay && <p className="text-red-500 text-sm font-bold">{errors.orderDay.message}</p>}
 
-          <Label htmlFor="status">Status</Label>
+          <Label>Status</Label>
           <Controller
             name="status"
             control={control}
@@ -178,8 +217,7 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
             )}
           />
 
-          
-          <Label htmlFor="description">Observação</Label>
+          <Label>Observação</Label>
           <Input placeholder="Observação" {...register("description")} />
 
           <Button type="submit">Salvar</Button>

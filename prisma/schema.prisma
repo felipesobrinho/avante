@@ -77,8 +77,7 @@ model Verification {
 model Orders {
   id          String   @id @default(uuid())
   description String?
-  quantity    Int
-  totalPrice  Int?
+  totalPrice  Decimal @db.Decimal(10,2) @default(0)
   status      String @default("PENDING")
   orderDay    DateTime?
   createdAt   DateTime @default(now())
@@ -86,11 +85,27 @@ model Orders {
 
   customerId  String
   customer    Customers  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  productId   String
-  product     Products   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  items       OrderItems[]
 
   @@map("orders")
 }
+
+model OrderItems {
+  id         String    @id @default(uuid())
+  orderId    String
+  productId  String
+  quantity   Int       @default(1)
+  unitPrice  Decimal   @db.Decimal(10,2)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  order      Orders    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Products  @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+  @@map("order_items")
+}
+
 
 model Customers {
   id String @id @default(uuid())
@@ -112,15 +127,15 @@ model Products {
 
   productionType ProductionType @default(SOB_ENCOMENDA)
   stock          Int?           // só será usado se productionType = EM_ESTOQUE
-  price          Decimal?
+  price          Decimal? 
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   categoryId     String
   category       Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orders         Orders[]
-
+  orderItems     OrderItems[]
+  
   @@map("products")
 }
 

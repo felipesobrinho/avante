@@ -28,18 +28,31 @@ import { Label } from "@/components/ui/label"
 import { useCustomersStore } from "@/stores/useCustomerStore"
 import { CreateCustomerModal } from "../../clientes/_components/create-customer-modal"
 import { useProductsStore } from "@/stores/useProductsStore"
-import { CreateProductModal } from "../../estoque/_components/create-product-modal"
+import ItemsRepeater from "./item-repeater"
+
+const itemSchema = z.object({ 
+  productId: z.string().min(1, "Selecione um produto"), 
+  quantity: z.number().min(1, "Qtd mínima 1"), 
+  unitPrice: z.number().optional()
+})
 
 const orderSchema = z.object({
   description: z.string().optional(),
-  quantity: z.number().min(1),
-  totalPrice: z.number().min(0),
   status: z.enum(["pendente", "pago", "entregue"]),
   orderDay: z.date({ error: "Selecione o dia do pedido!" }),
   customerId: z.string().min(1, "Selecione um cliente"),
-  productId: z.string().min(1, "Selecione um produto"),
+  items: z.array(itemSchema).min(1, "Adicione pelo menos um item"),
+}).superRefine((data, ctx) => {
+  const ids = data.items.map(i => i.productId).filter(Boolean)
+  const dup = ids.find((id, idx) => ids.indexOf(id) !== idx)
+  if (dup) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["items"],
+      message: "Há produtos repetidos na lista.",
+    })
+  }
 })
-
 
 type OrderFormData = z.infer<typeof orderSchema>
 
@@ -47,6 +60,7 @@ export function OrderModal() {
   const { addOrder } = useOrdersStore()
   const { customers, fetchCustomers } = useCustomersStore()
   const { products, fetchProducts } = useProductsStore()
+
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -61,6 +75,7 @@ export function OrderModal() {
     resolver: zodResolver(orderSchema),
     defaultValues: {
       orderDay: undefined,
+      items: [],
     },
   })
 
@@ -69,10 +84,19 @@ export function OrderModal() {
     fetchProducts()
   }, [fetchCustomers, fetchProducts])
 
+  const items = watch("items")
   const orderDay = watch("orderDay")
 
+  const setItems = (v: OrderFormData["items"]) => setValue("items", v, { shouldValidate: true })
+
   const onSubmit = async (data: OrderFormData) => {
-    await addOrder(data)
+    await addOrder({
+      description: data.description,
+      status: data.status,
+      orderDay: data.orderDay!,
+      customerId: data.customerId,
+      items: data.items,
+    })
     reset()
     setModalOpen(false)
   }
@@ -111,39 +135,13 @@ export function OrderModal() {
             <p className="text-red-500 text-sm font-bold">{errors.customerId.message}</p>
           )}
 
-          <Label htmlFor="product">Produto</Label>
-          <Select
-            onValueChange={(value) => setValue("productId", value, { shouldValidate: true })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um produto" />
-            </SelectTrigger>
-            <SelectContent>
-              {products.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name} - {p.measure}
-                </SelectItem>
-              ))}
-              <CreateProductModal />
-            </SelectContent>
-          </Select>
-          {errors.productId && (
-            <p className="text-red-500 text-sm font-bold">{errors.productId.message}</p>
-          )}
+          <ItemsRepeater
+            products={products}
+            value={items}
+            onChange={setItems}
+          />
 
-          <Label htmlFor="quantity">Quantidade</Label>
-          <Input
-            type="number"
-            placeholder="Quantidade"
-            {...register("quantity", { valueAsNumber: true })}
-          />
-          <Label htmlFor="totalPrice">Valor Total</Label>
-          <Input
-            type="number"
-            step="0.01"
-            placeholder="Valor Total"
-            {...register("totalPrice", { valueAsNumber: true })}
-          />
+          {errors.items && <p className="text-red-500 text-sm font-bold">{errors.items.message as string}</p>}
 
           <Label htmlFor="orderDay">Data do Pedido</Label>
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>

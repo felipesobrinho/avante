@@ -10,7 +10,6 @@ export async function GET() {
   return NextResponse.json(orders)
 }
 
-
 export async function POST(request: NextRequest) {
   const data = await request.json()
 

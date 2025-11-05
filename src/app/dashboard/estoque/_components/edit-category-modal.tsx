@@ -13,7 +13,7 @@ import { useCategoriesStore } from "@/stores/useCategoriesStore"
 
 const categorySchema = z.object({
     id: z.string(),
-    name: z.string().min(1),
+    name: z.string().min(1, "Nome da categoria é obrigatório"),
 })
 
 type CategoryFormData = z.infer<typeof categorySchema>
@@ -21,7 +21,7 @@ type CategoryFormData = z.infer<typeof categorySchema>
 export function EditCategoryModal({ categoryId }: { categoryId: string }) {
     const [modalOpen, setModalOpen ] = useState(false)
     const { editCategory } = useCategoriesStore()
-    const { register, handleSubmit, setValue, reset } = useForm<CategoryFormData>({
+    const { register, handleSubmit, setValue, reset, formState: { errors, isSubmitting } } = useForm<CategoryFormData>({
         resolver: zodResolver(categorySchema)
     })
 
@@ -56,11 +56,19 @@ export function EditCategoryModal({ categoryId }: { categoryId: string }) {
                 <DialogHeader>
                     <DialogTitle>Editar Categoria</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex flex-col">
                     <Label htmlFor="name">Nome da Categoria</Label>
-                    <Input placeholder="Nome" {...register("name")} />
+                    <Input
+                        placeholder="Nome"
+                        {...register("name")}
+                        id="name"
+                        aria-invalid={!!errors.name}
+                    />
+                    {errors.name && (
+                        <span className="text-red-500 text-sm">{errors.name.message}</span>
+                    )}
 
-                    <Button type="submit">Salvar</Button>
+                    <Button type="submit" disabled={isSubmitting}>Salvar</Button>
                 </form>
             </DialogContent>
         </Dialog>

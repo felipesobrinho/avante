@@ -2,6 +2,7 @@ export interface Product {
   id: string
   name: string
   description?: string
+  productionType: string,
   measure?: string
   price?: number
   stock?: number | null

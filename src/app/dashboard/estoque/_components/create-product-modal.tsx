@@ -69,7 +69,7 @@ export function CreateProductModal() {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Label>Nome</Label>
-          <Input {...register("name")} />
+          <Input {...register("name")} placeholder="Nome do produto" />
           {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
           <Label>Categoria</Label>
@@ -115,11 +115,11 @@ export function CreateProductModal() {
           {productionType === "EM_ESTOQUE" && (
             <>
               <Label>Preço</Label>
-              <Input type="number" step="0.01" {...register("price", { valueAsNumber: true })} />
+              <Input type="number" step="0.01" placeholder="Preço do produto" {...register("price", { valueAsNumber: true })} />
               {errors.price && <p className="text-red-500">{errors.price.message}</p>}
               
               <Label>Quantidade em Estoque</Label>
-              <Input type="number" {...register("stock", { valueAsNumber: true })} />
+              <Input type="number" placeholder="Quantidade em estoque" {...register("stock", { valueAsNumber: true })} />
               {errors.stock && (
                 <p className="text-red-500">{errors.stock.message}</p>
               )}
@@ -128,7 +128,7 @@ export function CreateProductModal() {
           )}
 
           <Label>Medida</Label>
-          <Input {...register("measure")} />
+          <Input {...register("measure")} placeholder="Medida do produto" />
           {errors.measure && <p className="text-red-500">{errors.measure.message}</p>}
 
           <Button type="submit">Cadastrar Produto</Button>

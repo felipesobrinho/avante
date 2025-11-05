@@ -141,19 +141,38 @@ export function ProductTable() {
             ),
             cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
         },
-        {
-            accessorKey: "stock",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Quantidade em Estoque
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => <div>{row.getValue("stock")}</div>,
-        },
+
+        ...(products.some((p) => p.productionType == "EM_ESTOQUE")
+            ? [
+                {
+                    accessorKey: "stock",
+                    header: ({ column }) => (
+                        <Button
+                            variant="ghost"
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            Quantidade em Estoque
+                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    ),
+                    cell: ({ row }) => <div>{row.getValue("stock")}</div>,
+                } as ColumnDef<Product>,
+            ]
+            : []),
+            
+        // {
+        //     accessorKey: "stock",
+        //     header: ({ column }) => (
+        //         <Button
+        //             variant="ghost"
+        //             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        //         >
+        //             Quantidade em Estoque
+        //             <ArrowUpDown className="ml-2 h-4 w-4" />
+        //         </Button>
+        //     ),
+        //     cell: ({ row }) => <div>{row.getValue("stock")}</div>,
+        // },
         {
             id: "actions",
             enableHiding: false,

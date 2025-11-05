@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useCategoriesStore } from "@/stores/useCategoriesStore";
 
 const categorySchema = z.object({
-    name: z.string().min(0, "Nome da categoria é obrigatório"),
+    name: z.string().min(1, "Nome da categoria é obrigatório"),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -18,15 +18,25 @@ type CategoryFormData = z.infer<typeof categorySchema>;
 export function CreateCategoryModal() {
     const { addCategory } = useCategoriesStore();
     const [modalOpen, setModalOpen] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
         resolver: zodResolver(categorySchema)
     });
 
     const onSubmit = async (data: CategoryFormData) => {
-        await addCategory(data);
-        reset();
-        setModalOpen(false);
+        setSubmitError(null);
+        if (!data.name || data.name.trim() === "") {
+            setSubmitError("Nome da categoria é obrigatório");
+            return;
+        }
+        try {
+            await addCategory(data);
+            reset();
+            setModalOpen(false);
+        } catch (err) {
+            setSubmitError("Erro ao cadastrar categoria.");
+        }
     };
 
     return (
@@ -42,6 +52,7 @@ export function CreateCategoryModal() {
                     <Label>Nome</Label>
                     <Input {...register("name")} />
                     {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+                    {submitError && <p className="text-red-500">{submitError}</p>}
 
                     <Button type="submit">Cadastrar Categoria</Button>
                 </form>

@@ -110,7 +110,7 @@ export function LoginForm({
             </div>
           </form>
 
-          <div className="bg-muted relative hidden md:block">
+          <div className="bg-muted relative hidden md:flex justify-center items-center">
             <Image
               src="/logoavante.png"
               width={500}

@@ -4,6 +4,9 @@ import { SiteHeader } from "@/components/site-header"
 import { useCustomersStore } from "@/stores/useCustomerStore"
 import { useEffect } from "react"
 import { CustomerTable } from "./_components/customer-table"
+import { CreateCustomerModal } from "./_components/create-customer-modal"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 
 export default function Page() {
   const { fetchCustomers } = useCustomersStore()
@@ -14,7 +17,13 @@ export default function Page() {
 
   return (
     <div>
-      <SiteHeader pageName="Clientes" />
+      <SiteHeader pageName="Clientes" action={
+        <CreateCustomerModal>
+            <Button variant="outline">
+                <Plus className="mr-2 h-4 w-4" /> Novo Cliente
+            </Button>
+        </CreateCustomerModal>
+      }/>
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

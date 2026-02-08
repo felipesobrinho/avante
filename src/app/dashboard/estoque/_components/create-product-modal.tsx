@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,7 +30,12 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-export function CreateProductModal() {
+type CreateProductModalProps = {
+  children: ReactNode;
+};
+
+
+export function CreateProductModal({ children }: CreateProductModalProps) {
   const { addProduct } = useProductsStore();
   const { categories, fetchCategories } = useCategoriesStore();
   const [modalOpen, setModalOpen] = useState(false);
@@ -61,7 +66,7 @@ export function CreateProductModal() {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-500 text-white">Novo Produto</Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

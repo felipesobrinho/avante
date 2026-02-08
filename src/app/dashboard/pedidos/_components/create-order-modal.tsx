@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useOrdersStore } from "@/stores/useOrdersStore"
@@ -56,7 +56,11 @@ const orderSchema = z.object({
 
 type OrderFormData = z.infer<typeof orderSchema>
 
-export function OrderModal() {
+type CreateOrderModalProps = {
+  children?: ReactNode,
+}
+
+export function OrderModal({ children }: CreateOrderModalProps) {
   const { addOrder } = useOrdersStore()
   const { customers, fetchCustomers } = useCustomersStore()
   const { products, fetchProducts } = useProductsStore()
@@ -104,9 +108,7 @@ export function OrderModal() {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger asChild>
-        <Button className="max-w-[300px] bg-blue-500 text-white">
-          Novo Pedido
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -127,7 +129,11 @@ export function OrderModal() {
                   {c.name} - {c.address}
                 </SelectItem>
               ))}
-              <CreateCustomerModal />
+              <CreateCustomerModal> 
+                <Button variant="outline" className="w-full">
+                  + Adicionar Cliente
+                </Button>
+              </CreateCustomerModal>
             </SelectContent>
           </Select>
 

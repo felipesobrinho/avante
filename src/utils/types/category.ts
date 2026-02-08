@@ -3,6 +3,9 @@ export type Category = {
     name: string;
     description?: string;
     parentId?: string;
+    _count?: {
+        products: number;
+    };
     createdAt: Date;
     updatedAt: Date;
 };

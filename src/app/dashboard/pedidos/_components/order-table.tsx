@@ -36,7 +36,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Order } from "@/utils/types/order";
 import { useOrdersStore } from "@/stores/useOrdersStore";
-import { OrderModal } from "./create-order-modal";
 import { EditOrderModal } from "./edit-order-modal";
 import { format } from "date-fns";
 
@@ -249,7 +248,6 @@ export function OrdersTable() {
       ) : (
         <>
           <div className="flex items-center py-4 gap-5">
-            <OrderModal />
             <Input
               placeholder="Buscar por cliente..."
               value={

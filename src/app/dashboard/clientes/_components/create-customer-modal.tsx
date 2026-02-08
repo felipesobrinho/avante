@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import * as z from "zod"
 import { Label } from "@/components/ui/label"
 import { useCustomersStore } from "@/stores/useCustomerStore"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
   
 const customerSchema = z.object({
   name: z.string().min(1),
@@ -22,7 +22,11 @@ const customerSchema = z.object({
 
 type CustomerFormData = z.infer<typeof customerSchema>
 
-export function CreateCustomerModal() {
+type CreateCustomerModalProps = {
+  children: ReactNode;
+};
+
+export function CreateCustomerModal({ children }: CreateCustomerModalProps) {
   const { addCustomer } = useCustomersStore()
   const [modalOpen, setModalOpen ] = useState(false)
 
@@ -44,9 +48,7 @@ export function CreateCustomerModal() {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger asChild>
-        <Button className="max-w-[300px] bg-blue-500 text-white">
-          Novo Cliente
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

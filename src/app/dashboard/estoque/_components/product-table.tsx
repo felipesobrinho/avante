@@ -47,8 +47,6 @@ export function ProductTable() {
  const { products, fetchProducts, deleteProduct, isLoading } =
   useProductsStore();
 
- console.log("Products:", products);
-
  useEffect(() => {
   fetchProducts();
  }, [fetchProducts]);
@@ -129,19 +127,19 @@ export function ProductTable() {
    ),
    cell: ({ row }) => <div>{row.getValue("measure")}</div>,
   },
-  {
-   accessorKey: "productionType",
-   header: ({ column }) => (
-    <Button
-     variant="ghost"
-     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    >
-     Tipo de Pedido
-     <ArrowUpDown className="ml-2 h-4 w-4" />
-    </Button>
-   ),
-   cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
-  },
+  // {
+  //  accessorKey: "productionType",
+  //  header: ({ column }) => (
+  //   <Button
+  //    variant="ghost"
+  //    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //   >
+  //    Tipo de Pedido
+  //    <ArrowUpDown className="ml-2 h-4 w-4" />
+  //   </Button>
+  //  ),
+  //  cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
+  // },
 
   ...(products.some((p) => p.productionType == "EM_ESTOQUE")
    ? [

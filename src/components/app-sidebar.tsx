@@ -21,8 +21,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Wrench } from "lucide-react"
 import { ModeToggle } from "./mode-toggle"
+import Image from "next/image"
 
 const data = {
   navMain: [
@@ -94,11 +94,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="flex items-center justify-center h-fit"
             >
               <a href="/dashboard">
-                <Wrench />
-                <span className="text-2xl font-semibold">Avante</span>
+                <Image src="/logoavante.png" alt="Logo" width={120} height={120} />
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

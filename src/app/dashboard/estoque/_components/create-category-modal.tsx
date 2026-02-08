@@ -1,62 +1,75 @@
 "use client";
-import { useState } from "react";
+
+import { useState, ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCategoriesStore } from "@/stores/useCategoriesStore";
 
 const categorySchema = z.object({
-    name: z.string().min(1, "Nome da categoria é obrigatório"),
+  name: z.string().min(1, "Nome da categoria é obrigatório"),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
 
-export function CreateCategoryModal() {
-    const { addCategory } = useCategoriesStore();
-    const [modalOpen, setModalOpen] = useState(false);
-    const [submitError, setSubmitError] = useState<string | null>(null);
+type CreateCategoryModalProps = {
+  children: ReactNode;
+};
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
-        resolver: zodResolver(categorySchema)
-    });
+export function CreateCategoryModal({ children }: CreateCategoryModalProps) {
+  const { addCategory } = useCategoriesStore();
+  const [open, setOpen] = useState(false);
 
-    const onSubmit = async (data: CategoryFormData) => {
-        setSubmitError(null);
-        if (!data.name || data.name.trim() === "") {
-            setSubmitError("Nome da categoria é obrigatório");
-            return;
-        }
-        try {
-            await addCategory(data);
-            reset();
-            setModalOpen(false);
-        } catch (err) {
-            setSubmitError("Erro ao cadastrar categoria.");
-        }
-    };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+  });
 
-    return (
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger asChild>
-                <Button className="bg-blue-500 text-white">Nova Categoria</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Criar Categoria</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <Label>Nome</Label>
-                    <Input {...register("name")} />
-                    {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-                    {submitError && <p className="text-red-500">{submitError}</p>}
+  const onSubmit = async (data: CategoryFormData) => {
+    await addCategory(data);
+    reset();
+    setOpen(false);
+  };
 
-                    <Button type="submit">Cadastrar Categoria</Button>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Criar Categoria</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Nome</Label>
+            <Input {...register("name")} />
+            {errors.name && (
+              <p className="text-sm text-red-500">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <Button type="submit">Cadastrar</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }

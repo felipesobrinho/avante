@@ -26,15 +26,17 @@ export default function Hero() {
               para manter suas escavadeiras e tratores em operação contínua.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href={"https://wa.me/9999999?text=Olá, tudo bem? Vim pelo site de vocês, gostaria de solicitar um orçamento!"}>
+              <Link href={"https://wa.me/31987277111?text=Olá, tudo bem? Vim pelo site de vocês, gostaria de solicitar um orçamento!"}>
                 <Button size="lg" className="text-lg px-8">
                     Fale com um Especialista
                     <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="text-lg px-8 border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent">
-                Ver Catálogo de Produtos
-              </Button>
+              <Link href={"#produtos"}>
+                <Button size="lg" variant="outline" className="text-lg px-8 border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent">
+                  Ver Catálogo de Produtos
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

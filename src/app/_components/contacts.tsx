@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 export default function Contacts() {
 
@@ -20,7 +19,7 @@ export default function Contacts() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground">Endereço</h4>
-                    <p className="text-muted-foreground">Av. Industrial, 1500 - Distrito Industrial<br />Belo Horizonte - MG, 30000-000</p>
+                    <p className="text-muted-foreground">Rua Falcão, 195 - São Lucas <br />Belo Horizonte - MG, 30110-021</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -29,7 +28,7 @@ export default function Contacts() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground">Telefone</h4>
-                    <p className="text-muted-foreground">(31) 3333-4444<br />(31) 99999-8888 (WhatsApp)</p>
+                    <p className="text-muted-foreground">(31) 98727-7111 (Telefone e WhatsApp)</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -38,12 +37,12 @@ export default function Contacts() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground">E-mail</h4>
-                    <p className="text-muted-foreground">contato@vedatech.com.br<br />vendas@vedatech.com.br</p>
+                    <p className="text-muted-foreground">avanteborrachas@gmail.com</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="bg-secondary rounded-2xl p-8">
+            {/* <div className="bg-secondary rounded-2xl p-8">
               <h3 className="text-xl font-semibold text-foreground mb-6">Solicite um Orçamento</h3>
               <form className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -78,7 +77,7 @@ export default function Contacts() {
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </form>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

@@ -23,7 +23,7 @@ export default function NavLanding() {
             <Link href="/login">
               <Button variant="outline">Portal do Cliente</Button>
             </Link>
-            <Link href={"https://wa.me/9999999?text=Olá, tudo bem? Vim pelo site de vocês, gostaria de solicitar um orçamento!"}>
+            <Link href={"https://wa.me/31987277111?text=Olá, tudo bem? Vim pelo site de vocês, gostaria de solicitar um orçamento!"}>
               <Button className="hidden sm:flex">
                 Solicitar Orçamento
                 <ChevronRight className="w-4 h-4 ml-1" />

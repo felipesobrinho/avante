@@ -12,7 +12,7 @@ import {
  getSortedRowModel,
  useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Trash } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus, Trash } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -268,7 +268,11 @@ export function ProductTable() {
    ) : (
     <>
      <div className="flex items-center py-4 gap-5">
-      <CreateProductModal />
+      <CreateProductModal>
+        <Button variant="outline">
+          <Plus className="mr-2 h-4 w-4" /> Novo Produto
+        </Button>
+      </CreateProductModal>
       <Input
        placeholder="Buscar por nome..."
        value={(table.getColumn("name")?.getFilterValue() as string) || ""}

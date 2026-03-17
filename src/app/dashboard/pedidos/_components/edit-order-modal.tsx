@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import * as z from "zod"
-import { CalendarIcon, Pencil } from "lucide-react"
+import { CalendarIcon, Pencil, Plus } from "lucide-react"
 import { useOrdersStore } from "@/stores/useOrdersStore"
 import { Calendar } from "@/components/ui/calendar"
 import { ptBR } from "date-fns/locale"
@@ -158,7 +158,11 @@ export function EditOrderModal({ orderId }: { orderId: string }) {
                       {c.name} - {c.address}
                     </SelectItem>
                   ))}
-                  <CreateCustomerModal />
+                  <CreateCustomerModal>
+                    <Button variant="outline">
+                      <Plus className="mr-2 h-4 w-4" /> Novo Cliente
+                    </Button>
+                  </CreateCustomerModal>
                 </SelectContent>
               </Select>
             )}

@@ -128,16 +128,16 @@ export function EditProductModal({ productId }: { productId: string }) {
             </p>
           )}
 
+          <Label htmlFor="price">Preço</Label>
+          <Input
+            placeholder="Preço"
+            type="number"
+            step="0.01"
+            {...register("price", { valueAsNumber: true })}
+          />
+
           {productionType === "EM_ESTOQUE" && (
             <>
-              <Label htmlFor="price">Preço</Label>
-              <Input
-                placeholder="Preço"
-                type="number"
-                step="0.01"
-                {...register("price", { valueAsNumber: true })}
-              />
-
               <Label htmlFor="stock">Quantidade em Estoque</Label>
               <Input
                 type="number"

@@ -74,6 +74,7 @@ export function ProductTable() {
    enableSorting: false,
    enableHiding: false,
   },
+  
   {
    accessorKey: "name",
    header: ({ column }) => (
@@ -87,6 +88,7 @@ export function ProductTable() {
    ),
    cell: ({ row }) => <div>{row.getValue("name")}</div>,
   },
+
   {
    id: "categoryName",
    header: ({ column }) => (
@@ -101,19 +103,20 @@ export function ProductTable() {
    accessorFn: (row) => row.category?.name ?? "",
    cell: ({ row }) => <div>{row.getValue("categoryName")}</div>,
   },
-  // {
-  //     accessorKey: "price",
-  //     header: ({ column }) => (
-  //         <Button
-  //             variant="ghost"
-  //             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //             Preço
-  //             <ArrowUpDown className="ml-2 h-4 w-4" />
-  //         </Button>
-  //     ),
-  //     cell: ({ row }) => <div>R$ {Number(row.getValue("price")).toFixed(2)}</div>,
-  // },
+
+  {
+      accessorKey: "price",
+      header: ({ column }) => (
+          <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+              Preço
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+      ),
+      cell: ({ row }) => <div>R$ {Number(row.getValue("price")).toFixed(2)}</div>,
+  },
   {
    accessorKey: "measure",
    header: ({ column }) => (
@@ -127,19 +130,19 @@ export function ProductTable() {
    ),
    cell: ({ row }) => <div>{row.getValue("measure")}</div>,
   },
-  // {
-  //  accessorKey: "productionType",
-  //  header: ({ column }) => (
-  //   <Button
-  //    variant="ghost"
-  //    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //   >
-  //    Tipo de Pedido
-  //    <ArrowUpDown className="ml-2 h-4 w-4" />
-  //   </Button>
-  //  ),
-  //  cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
-  // },
+  {
+   accessorKey: "productionType",
+   header: ({ column }) => (
+    <Button
+     variant="ghost"
+     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    >
+     Tipo de Pedido
+     <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+   ),
+   cell: ({ row }) => <div>{row.getValue("productionType")}</div>,
+  },
 
   ...(products.some((p) => p.productionType == "EM_ESTOQUE")
    ? [
@@ -188,20 +191,6 @@ export function ProductTable() {
     return <div>{formatted}</div>;
    },
   },
-
-  // {
-  //     accessorKey: "stock",
-  //     header: ({ column }) => (
-  //         <Button
-  //             variant="ghost"
-  //             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //             Quantidade em Estoque
-  //             <ArrowUpDown className="ml-2 h-4 w-4" />
-  //         </Button>
-  //     ),
-  //     cell: ({ row }) => <div>{row.getValue("stock")}</div>,
-  // },
   {
    id: "actions",
    enableHiding: false,

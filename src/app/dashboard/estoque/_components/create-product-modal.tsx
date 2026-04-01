@@ -117,12 +117,12 @@ export function CreateProductModal({ children }: CreateProductModalProps) {
             <p className="text-red-500">{errors.productionType.message}</p>
           )}
 
+            <Label>Preço</Label>
+            <Input type="number" step="0.01" placeholder="Preço do produto" {...register("price", { valueAsNumber: true })} />
+            {errors.price && <p className="text-red-500">{errors.price.message}</p>}
+
           {productionType === "EM_ESTOQUE" && (
             <>
-              <Label>Preço</Label>
-              <Input type="number" step="0.01" placeholder="Preço do produto" {...register("price", { valueAsNumber: true })} />
-              {errors.price && <p className="text-red-500">{errors.price.message}</p>}
-              
               <Label>Quantidade em Estoque</Label>
               <Input type="number" placeholder="Quantidade em estoque" {...register("stock", { valueAsNumber: true })} />
               {errors.stock && (
